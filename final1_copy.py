@@ -4,23 +4,6 @@ from time import sleep
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 from time import sleep
 import json
 # import shared
@@ -31,17 +14,14 @@ from gpiozero import LED
 import adafruit_dht
 import board
 import neopixel
-
-
-initiation_password = 0000
-current_password = 0000
-
-
 # DHT22 센서 설정
 dht_device = adafruit_dht.DHT22(board.D4)
 # 초기 비밀번호 설정
-password123 = int(initiation_password)
+initial_password = 0000
+password123 = int(initial_password)
 # password123 = 12345
+
+
 
 def get_data():
     while True:
@@ -61,7 +41,7 @@ MQTT_HOST = "mqtt-dashboard.com"
 MQTT_PORT = 1883
 MQTT_KEEPALIVE_INTERVAL = 60
 MQTT_SUB_TOPIC = f"mobile/{MY_ID}/light"
-MQTT_SUB_ALL_TOPIC = f"mobile/all/light"
+MQTT_SUB_ALL_TOPIC = f"mobile/{MY_ID}/light"
 MQTT_PUB_TOPIC = f"mobile/{MY_ID}/sensing"
 
 # LED 설정
@@ -84,58 +64,33 @@ def on_message(client, userdata, message):
     else:
         pass
 
-# MQTT 클라이언트 설정 및 연결
-client = mqtt.Client(mqtt.CallbackAPIVersion.VERSION2)
-client.on_message = on_message
-client.connect(MQTT_HOST, MQTT_PORT, MQTT_KEEPALIVE_INTERVAL)
-client.subscribe(MQTT_SUB_TOPIC)
-client.subscribe(MQTT_SUB_ALL_TOPIC)
-client.loop_start()
+# ###################################################################################################################################
 
-try:
-    while True:
-        temperature, humidity, password123 = get_data()
-        sensing = {
-            "temperature": temperature,
-            "humidity": humidity,
-            "password123": password123
-        }
-        value = json.dumps(sensing)
-        client.publish(MQTT_PUB_TOPIC, value)
-        sleep(1)
-except KeyboardInterrupt:
-    pass
-finally:
-    client.loop_stop()
-    client.disconnect()
+# # MQTT 클라이언트 설정 및 연결
+# client = mqtt.Client(mqtt.CallbackAPIVersion.VERSION2)
+# client.on_message = on_message
+# client.connect(MQTT_HOST, MQTT_PORT, MQTT_KEEPALIVE_INTERVAL)
+# client.subscribe(MQTT_SUB_TOPIC)
+# client.subscribe(MQTT_SUB_ALL_TOPIC)
+# client.loop_start()
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+# try:
+#     while True:
+#         temperature, humidity, password123 = get_data()
+#         sensing = {
+#             "temperature": temperature,
+#             "humidity": humidity,
+#             "password123": password123
+#         }
+#         value = json.dumps(sensing)
+#         client.publish(MQTT_PUB_TOPIC, value)
+#         sleep(1)
+# except KeyboardInterrupt:
+#     pass
+# finally:
+#     client.loop_stop()
+#     client.disconnect()
+####################################################################################################################################
 
 
 
@@ -193,6 +148,31 @@ pixels[3] = (0,0,0)
 pixels.show()
 
 while True:
+    ####################################################################################################################################
+    # MQTT 클라이언트 설정 및 연결
+    client = mqtt.Client(mqtt.CallbackAPIVersion.VERSION2)
+    client.on_message = on_message
+    client.connect(MQTT_HOST, MQTT_PORT, MQTT_KEEPALIVE_INTERVAL)
+    client.subscribe(MQTT_SUB_TOPIC)
+    client.subscribe(MQTT_SUB_ALL_TOPIC)
+    client.loop_start()
+    try:
+        while True:
+            temperature, humidity, password123 = get_data()
+            sensing = {
+                "temperature": temperature,
+                "humidity": humidity,
+                "password123": password123
+            }
+            value = json.dumps(sensing)
+            client.publish(MQTT_PUB_TOPIC, value)
+            sleep(1)
+    except KeyboardInterrupt:
+        pass
+    finally:
+        client.loop_stop()
+        client.disconnect()
+####################################################################################################################################
     if (temperature123 >= 30):
         print("Your House is burning!")
         break
@@ -210,6 +190,32 @@ while True:
     led_Y.on()
     # initiation_password = int(getpass.getpass("초기 비밀번호: "))
     initiation_password = getpass.getpass("초기 비밀번호: ")
+        ####################################################################################################################################
+    # MQTT 클라이언트 설정 및 연결
+    client = mqtt.Client(mqtt.CallbackAPIVersion.VERSION2)
+    client.on_message = on_message
+    client.connect(MQTT_HOST, MQTT_PORT, MQTT_KEEPALIVE_INTERVAL)
+    client.subscribe(MQTT_SUB_TOPIC)
+    client.subscribe(MQTT_SUB_ALL_TOPIC)
+    client.loop_start()
+    try:
+        while True:
+            temperature, humidity, password123 = get_data()
+            sensing = {
+                "temperature": temperature,
+                "humidity": humidity,
+                "password123": password123
+            }
+            value = json.dumps(sensing)
+            client.publish(MQTT_PUB_TOPIC, value)
+            sleep(1)
+    except KeyboardInterrupt:
+        pass
+    finally:
+        client.loop_stop()
+        client.disconnect()
+####################################################################################################################################
+
     if initiation_password == '0000':
         print("Please change the password_ Do not use \"0000\".")
     else:
@@ -227,6 +233,31 @@ while (i != 3):
     current_password = 0000
     # current_password = int(getpass.getpass("Tell me a password: "))
     current_password = getpass.getpass("Tell me a password: ")
+    ####################################################################################################################################
+    # MQTT 클라이언트 설정 및 연결
+    client = mqtt.Client(mqtt.CallbackAPIVersion.VERSION2)
+    client.on_message = on_message
+    client.connect(MQTT_HOST, MQTT_PORT, MQTT_KEEPALIVE_INTERVAL)
+    client.subscribe(MQTT_SUB_TOPIC)
+    client.subscribe(MQTT_SUB_ALL_TOPIC)
+    client.loop_start()
+    try:
+        while True:
+            temperature, humidity, password123 = get_data()
+            sensing = {
+                "temperature": temperature,
+                "humidity": humidity,
+                "password123": password123
+            }
+            value = json.dumps(sensing)
+            client.publish(MQTT_PUB_TOPIC, value)
+            sleep(1)
+    except KeyboardInterrupt:
+        pass
+    finally:
+        client.loop_stop()
+        client.disconnect()
+####################################################################################################################################
     # set123.update_password()
     if (current_password == initiation_password):
         print("You Welcome")
@@ -269,6 +300,32 @@ while (i != 3):
                 led_G.on()
                 print("Successfuly Changed")
                 initiation_password = initiation_password_n
+                ####################################################################################################################################
+                # MQTT 클라이언트 설정 및 연결
+                client = mqtt.Client(mqtt.CallbackAPIVersion.VERSION2)
+                client.on_message = on_message
+                client.connect(MQTT_HOST, MQTT_PORT, MQTT_KEEPALIVE_INTERVAL)
+                client.subscribe(MQTT_SUB_TOPIC)
+                client.subscribe(MQTT_SUB_ALL_TOPIC)
+                client.loop_start()
+                try:
+                    while True:
+                        temperature, humidity, password123 = get_data()
+                        sensing = {
+                            "temperature": temperature,
+                            "humidity": humidity,
+                            "password123": password123
+                        }
+                        value = json.dumps(sensing)
+                        client.publish(MQTT_PUB_TOPIC, value)
+                        sleep(1)
+                except KeyboardInterrupt:
+                    pass
+                finally:
+                    client.loop_stop()
+                    client.disconnect()
+####################################################################################################################################
+
                 # set123.update_password()
                 sleep(1)
                 led_G.off()
