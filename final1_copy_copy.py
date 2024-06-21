@@ -1,53 +1,45 @@
 import getpass
 from time import sleep
-import paho.mqtt.client as mqtt
-from gpiozero import LED
-import adafruit_dht
-import board
-import neopixel
 
-
-from time import sleep
+####################
+### MQTT ###
 import json
-
 import paho.mqtt.client as mqtt
-from gpiozero import LED
 import adafruit_dht
 import board
 
+# Initialize the DHT22 sensor
 dht_device = adafruit_dht.DHT22(board.D4)
 
+def get_data():
+    while True:
+        try:
+            temperature = dht_device.temperature
+            humidity = dht_device.humidity
+            return temperature, humidity
+        except RuntimeError as error:
+            sleep(2.0)
+            continue
+
+# MQTT settings
+MY_ID = "05"
+MQTT_HOST = "mqtt-dashboard.com"
+MQTT_PORT = 1883
+MQTT_KEEPALIVE_INTERVAL = 60
+MQTT_PUB_TOPIC = f"mobile/{MY_ID}/sensing"
+
+# Initialize MQTT client
+client = mqtt.Client()
+
+# Connect to MQTT broker
+client.connect(MQTT_HOST, MQTT_PORT, MQTT_KEEPALIVE_INTERVAL)
+client.loop_start()
 
 
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+####################
 
 ## 초음파센서 ##
 from gpiozero import DistanceSensor
@@ -100,11 +92,14 @@ pixels[3] = (0,0,0)
 pixels.show()
 
 while True:
-    if (temperature123 >= 30):
-        print("Your House is burning!")
-        break
-    print(round(sensor.distance * 100, 2))
-    sleep(1.0)
+        # temperature, humidity = get_data()
+        # sensing = {
+        #     "temperature": temperature,
+        #     "humidity": humidity
+        # }
+        # value = json.dumps(sensing)
+        # client.publish(MQTT_PUB_TOPIC, value)
+        # sleep(0.5)
     if (round(sensor.distance * 100, 2) <= 4.1):
         break
 
@@ -195,6 +190,8 @@ while (i != 3):
         led_G.on()
 if (i == 3):
     print("!!!!You cannot come in!!!!")
+    led_G.off()
+    led_R.on()
     pixels[0] = (255,0,0)
     pixels[1] = (1,0,255)
     pixels[2] = (255,0,0)

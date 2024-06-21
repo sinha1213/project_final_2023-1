@@ -1,52 +1,5 @@
 import getpass
 from time import sleep
-import paho.mqtt.client as mqtt
-from gpiozero import LED
-import adafruit_dht
-import board
-import neopixel
-
-
-from time import sleep
-import json
-
-import paho.mqtt.client as mqtt
-from gpiozero import LED
-import adafruit_dht
-import board
-
-dht_device = adafruit_dht.DHT22(board.D4)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 ## 초음파센서 ##
@@ -74,17 +27,11 @@ from gpiozero import PWMOutputDevice
 buzzer_pin = 12
 pwm_device = PWMOutputDevice(pin=buzzer_pin, frequency=0,initial_value=0.5)
 tones = [0, 261, 294, 329, 349, 392, 440, 493, 523]
-beep_music = [8, 1, 8, 1, 8]
-beep_term = [0.5, 0.5, 0.5, 0.5, 0.5]
+beep_music = [8, 1, 8, 1, 8, 1, 8]
+beep_term = [0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5]
 welcome_music = [1, 3, 5, 8]
 welcome_term = [1, 1, 1, 1]
 ##############
-### Temperature ###
-import adafruit_dht
-dht_device = adafruit_dht.DHT22(board.D4)
-temperature123 = dht_device.temperature
-#############
-
 ### Button ###
 from gpiozero import Button
 button = Button(24, pull_up=False, bounce_time = 0.1) #bounce_time = 0.1
@@ -100,39 +47,28 @@ pixels[3] = (0,0,0)
 pixels.show()
 
 while True:
-    if (temperature123 >= 30):
-        print("Your House is burning!")
-        break
     print(round(sensor.distance * 100, 2))
     sleep(1.0)
     if (round(sensor.distance * 100, 2) <= 4.1):
         break
 
+initiation_password = 0000
+
 while True:
-    if (temperature123 >= 30):
-        print("Your House is burning!")
-        break
+
     led_Y.on()
-    # initiation_password = int(getpass.getpass("초기 비밀번호: "))
     initiation_password = getpass.getpass("초기 비밀번호: ")
     if initiation_password == '0000':
         print("Please change the password_ Do not use \"0000\".")
     else:
         led_Y.off()
         break
-# set123.update_password()
 
 i = 0
 while (i != 3):
-# while True:
-    if (temperature123 >= 30):
-        print("Your House is burning!")
-        break
     led_G.on()
     current_password = 0000
-    # current_password = int(getpass.getpass("Tell me a password: "))
     current_password = getpass.getpass("Tell me a password: ")
-    # set123.update_password()
     if (current_password == initiation_password):
         print("You Welcome")
         for k in range(5):
@@ -161,8 +97,6 @@ while (i != 3):
                 led_Y.off()
                 sleep(0.3)
             led_Y.on()
-            # initiation_password = int(getpass.getpass("Reset your password: "))
-            # check_password = int(getpass.getpass("Checking your password: "))
             initiation_password_n = getpass.getpass("Reset your password: ")
             check_password = getpass.getpass("Checking your password: ")
             if (initiation_password_n == '0000'):
@@ -174,7 +108,6 @@ while (i != 3):
                 led_G.on()
                 print("Successfuly Changed")
                 initiation_password = initiation_password_n
-                # set123.update_password()
                 sleep(1)
                 led_G.off()
                 i = 0
@@ -195,6 +128,8 @@ while (i != 3):
         led_G.on()
 if (i == 3):
     print("!!!!You cannot come in!!!!")
+    led_G.off()
+    led_R.on()
     pixels[0] = (255,0,0)
     pixels[1] = (1,0,255)
     pixels[2] = (255,0,0)
@@ -202,6 +137,56 @@ if (i == 3):
     pixels.show()
     for h in range(len(beep_music)):
         pwm_device.frequency = tones[beep_music[h]]
-        pwm_device.value = 0.5  # 50% duty cycle
+        pwm_device.value = 0.5 
         sleep(beep_term[h])
         pwm_device.value = 0
+
+
+
+#######################################
+from time import sleep
+import json
+import paho.mqtt.client as mqtt
+import adafruit_dht
+import board
+
+dht_device = adafruit_dht.DHT22(board.D4)
+
+def get_data():
+    while True:
+        try:
+            temperature = dht_device.temperature
+            humidity = dht_device.humidity
+            return temperature, humidity
+        except RuntimeError as error:
+            sleep(2.0)
+            continue
+
+MY_ID = "05"
+
+MQTT_HOST = "mqtt-dashboard.com"
+MQTT_PORT = 1883
+MQTT_KEEPALIVE_INTERVAL = 60
+MQTT_PUB_TOPIC = f"mobile/{MY_ID}/sensing"
+
+client = mqtt.Client()
+client.connect(MQTT_HOST, MQTT_PORT, MQTT_KEEPALIVE_INTERVAL)
+client.loop_start()
+
+try:
+    while True:
+        temperature, humidity = get_data()
+        sensing = {
+            "temperature": temperature,
+            "humidity": humidity
+        }
+        value = json.dumps(sensing)
+        client.publish(MQTT_PUB_TOPIC, value)
+        print(value)
+
+        sleep(1)
+except KeyboardInterrupt:
+    print("종료합니다!!")
+finally:
+    client.loop_stop()
+    client.disconnect()
