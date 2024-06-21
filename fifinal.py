@@ -27,8 +27,8 @@ from gpiozero import PWMOutputDevice
 buzzer_pin = 12
 pwm_device = PWMOutputDevice(pin=buzzer_pin, frequency=0,initial_value=0.5)
 tones = [0, 261, 294, 329, 349, 392, 440, 493, 523]
-beep_music = [8, 1, 8, 1, 8, 1, 8]
-beep_term = [0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5]
+beep_music = [8, 1, 8, 1, 8, 1, 8, 1]
+beep_term = [0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5]
 welcome_music = [1, 3, 5, 8]
 welcome_term = [1, 1, 1, 1]
 Whereareyou_music = [8, 1, 0, 8, 1]
@@ -45,8 +45,29 @@ def button_pressed():
         pwm_device.value = 0.5 
         sleep(Whereareyou_term[h])
         pwm_device.value = 0
+#button.when_pressed = button_pressed
 
+###################
+### moter ###
+import RPi.GPIO as GPIO
+import time
 
+servo_pin = 18
+GPIO.setmode(GPIO.BCM)
+GPIO.setup(servo_pin, GPIO.OUT)
+pwm = GPIO.PWM(servo_pin, 50)  # 주파수 50Hz로 설정
+pwm.start(0)
+
+def set_angle(angle):
+    duty = angle / 18 + 2
+    GPIO.output(servo_pin, True)
+    pwm.ChangeDutyCycle(duty)
+    time.sleep(1)
+    GPIO.output(servo_pin, False)
+    pwm.ChangeDutyCycle(0)
+
+set_angle(0)
+######################
 
 pixels[0] = (0,0,0)
 pixels[1] = (0,0,0)
@@ -60,8 +81,6 @@ while True:
     sleep(1.0)
     if (round(sensor.distance * 100, 2) <= 4.1):
         break
-
-initiation_password = 0000
 
 while True:
     button.when_pressed = button_pressed
@@ -77,7 +96,6 @@ i = 0
 while (i != 3):
     button.when_pressed = button_pressed
     led_G.on()
-    current_password = 0000
     current_password = getpass.getpass("Tell me a password: ")
     if (current_password == initiation_password):
         print("You Welcome")
@@ -96,7 +114,8 @@ while (i != 3):
             pwm_device.value = 0.5  # 50% duty cycle
             sleep(welcome_term[h])
             pwm_device.value = 0
-
+        set_angle(90)
+        sleep(0.5)
         break
     if (current_password == '0000'):
         while True:
