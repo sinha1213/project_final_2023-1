@@ -31,6 +31,8 @@ beep_music = [8, 1, 8, 1, 8, 1, 8]
 beep_term = [0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5]
 welcome_music = [1, 3, 5, 8]
 welcome_term = [1, 1, 1, 1]
+Whereareyou_music = [8, 1, 0, 8, 1]
+Whereareyou_term = [1, 0.5, 1, 1, 0.5]
 ##############
 ### Button ###
 from gpiozero import Button
@@ -38,6 +40,12 @@ button = Button(24, pull_up=False, bounce_time = 0.1) #bounce_time = 0.1
 
 def button_pressed():
     print("Where are you")
+    for h in range(len(Whereareyou_music)):
+        pwm_device.frequency = tones[Whereareyou_music[h]]
+        pwm_device.value = 0.5 
+        sleep(Whereareyou_term[h])
+        pwm_device.value = 0
+
 
 
 pixels[0] = (0,0,0)
@@ -47,6 +55,7 @@ pixels[3] = (0,0,0)
 pixels.show()
 
 while True:
+    button.when_pressed = button_pressed
     print(round(sensor.distance * 100, 2))
     sleep(1.0)
     if (round(sensor.distance * 100, 2) <= 4.1):
@@ -55,7 +64,7 @@ while True:
 initiation_password = 0000
 
 while True:
-
+    button.when_pressed = button_pressed
     led_Y.on()
     initiation_password = getpass.getpass("초기 비밀번호: ")
     if initiation_password == '0000':
@@ -66,6 +75,7 @@ while True:
 
 i = 0
 while (i != 3):
+    button.when_pressed = button_pressed
     led_G.on()
     current_password = 0000
     current_password = getpass.getpass("Tell me a password: ")
@@ -90,6 +100,7 @@ while (i != 3):
         break
     if (current_password == '0000'):
         while True:
+            button.when_pressed = button_pressed
             led_G.off()
             for z in range(2):
                 led_Y.on()
